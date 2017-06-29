@@ -1,0 +1,42 @@
+diff -aur hplip-3.17.6-a/configure.in hplip-3.17.6-b/configure.in
+--- hplip-3.17.6-a/configure.in	2017-06-02 15:16:04.000000000 +1000
++++ hplip-3.17.6-b/configure.in	2017-06-13 11:23:33.087238037 +1000
+@@ -560,6 +560,8 @@
+       AC_CHECK_HEADERS(usb.h, ,[AC_MSG_ERROR([cannot find libusb-devel support], 11)])
+    else
+       AC_CHECK_LIB([usb-1.0], [libusb_init], [LIBS="$LIBS"], [AC_MSG_ERROR([cannot find libusb 1.0 support], 2)])
++      LIBUSBINCLUDEROOT?="/usr/include/"
++      AC_ARG_VAR(LIBUSBINCLUDEROOT, [path to libusb-1.0 folder])
+       AC_CHECK_HEADERS(libusb-1.0/libusb.h, ,[AC_MSG_ERROR([cannot find libusb-1.0-devel support], 11)])
+    fi
+ fi
+diff -aur hplip-3.17.6-a/Makefile.am hplip-3.17.6-b/Makefile.am
+--- hplip-3.17.6-a/Makefile.am	2017-06-02 15:15:47.000000000 +1000
++++ hplip-3.17.6-b/Makefile.am	2017-06-14 09:35:43.844866963 +1000
+@@ -98,7 +98,7 @@
+ libhpmud_la_LDFLAGS += -lusb
+ else
+ libhpmud_la_SOURCES += io/hpmud/musb.c 
+-libhpmud_la_CFLAGS  += -I/usr/include/libusb-1.0
++libhpmud_la_CFLAGS  += -I/$(LIBUSBINCLUDEROOT)/libusb-1.0
+ libhpmud_la_LDFLAGS += -lusb-1.0
+ endif
+ 
+@@ -286,7 +286,7 @@
+ #hpipp_LTLIBRARIES = hpipp.la
+ #hpipp_la_LDFLAGS = -module -avoid-version
+ libhpipp_la_SOURCES = protocol/hp_ipp.c protocol/hp_ipp.h protocol/hp_ipp_i.h
+-libhpipp_la_CFLAGS = -DCONFDIR=\"$(hplip_confdir)\"
++libhpipp_la_CFLAGS = -DCONFDIR=\"$(hplip_confdir)\" -I$(PYTHONINCLUDEDIR)
+ libhpipp_la_LDFLAGS = -version-info 0:1:0
+ libhpipp_la_LIBADD = libhpmud.la
+ 
+@@ -326,7 +326,7 @@
+ endif
+ 
+ if !LIBUSB01_BUILD
+-hpmudext_la_CFLAGS +=-I/usr/include/libusb-1.0 
++hpmudext_la_CFLAGS +=-I$(LIBUSBINCLUDEROOT)/libusb-1.0 
+ endif
+ 
+ # ui (qt3)
